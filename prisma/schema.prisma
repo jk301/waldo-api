@@ -11,3 +11,45 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Scene {
+  id         Int         @id @default(autoincrement())
+  slug       String      @unique 
+  title      String 
+  characters Character[]
+  scores     Score[]
+  gameSession GameSession[]
+}
+
+model Character {
+  id       Int    @id @default(autoincrement())
+  name     String 
+  x        Int 
+  y        Int 
+  radius   Int 
+  scene    Scene  @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  sceneId  Int
+
+  @@unique([sceneId, name])
+}
+
+// Leaderboard
+model Score {
+  id        Int      @id @default(autoincrement())
+  playerName String
+  timeMs    Int 
+  createdAt DateTime @default(now())
+  scene     Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  sceneId   Int
+
+  @@index([sceneId, timeMs])
+}
+
+model GameSession {
+  id         String    @id @default(cuid())
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  found      Int[]
+  scene     Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  sceneId   Int
+}
