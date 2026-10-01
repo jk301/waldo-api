@@ -17,7 +17,7 @@ export async function getScene(req, res) {
     } catch (error) {
         console.log(error)
     }
-}sceneId
+}
 
 export async function getOneCharFromScene (req, res) {
     const { slug, charId } = req.params
