@@ -13,12 +13,12 @@ datasource db {
 }
 
 model Scene {
-  id         Int         @id @default(autoincrement())
-  slug       String      @unique 
-  title      String 
-  characters Character[]
-  scores     Score[]
-  gameSession GameSession[]
+id         Int         @id @default(autoincrement())
+slug       String      @unique 
+title      String 
+characters Character[]
+scores     Score[]
+gameSession GameSession[]
 }
 
 model Character {
