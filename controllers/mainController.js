@@ -52,6 +52,41 @@ export async function getAllScoreByScene (req, res) {
     }
 }
 
+export async function coordsCheck (req, res) {
+    const { slug } = req.params
+    const x = Number(req.params.x)
+    const y = Number(req.params.y)
+
+    if (Number.isNaN(x) || Number.isNaN(y)) {
+        return res.status(400).json({ error: "Invalid coordinates" })
+    }
+
+    function isInsideRadius (x, y, charX, charY, rSqred) {
+        const subX = x - charX
+        const subY = y - charY
+        const addedSub = Math.pow(subX, 2) + Math.pow(subY, 2)
+        return (addedSub <= rSqred) 
+    }
+
+    try {
+        const scene = await prisma.scene.findUnique({ where: { slug } })
+        if (!scene) return res.status(404).json({ error: "Scene not found" })
+        const allChar = await prisma.character.findMany({ where: { sceneId: scene.id } })
+        
+        for (const char of allChar) {
+            const result = isInsideRadius(x, y, char.x, char.y, char.radius ** 2)
+            if (result) {
+                return res.status(200).json({ hit: true, name: char.name })
+            }
+        }
+
+        return res.json({ hit: false })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
 export async function postScore (req, res) {
     const { slug } = req.params
     const { playerName, timeMs } = req.body
