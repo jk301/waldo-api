@@ -54,8 +54,8 @@ export async function getAllScoreByScene (req, res) {
 
 export async function coordsCheck (req, res) {
     const { slug } = req.params
-    const x = Number(req.params.x)
-    const y = Number(req.params.y)
+    const x = Number(req.query.x)
+    const y = Number(req.query.y)
 
     if (Number.isNaN(x) || Number.isNaN(y)) {
         return res.status(400).json({ error: "Invalid coordinates" })
