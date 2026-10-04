@@ -103,3 +103,46 @@ export async function postScore (req, res) {
         console.log(error)
     }
 }
+
+export async function startTime (req, res) {
+    const { slug } = req.params
+    try {
+        const scene = await prisma.scene.findUnique({ where: { slug } })
+        if (!scene) return res.status(404).json({ error: "Scene not found" })
+        const start = await prisma.gameSession.create({ data: { sceneId: scene.id } })
+        console.log('session created')
+        return res.json({ id: start.id })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
+export async function stopTime(req, res) {
+  const { sessId } = req.params
+
+  try {
+
+    const session = await prisma.gameSession.update({
+      where: { id: sessId },
+      data: { finishedAt: new Date() },
+    })
+
+    console.log(`Session updated: ${session}`)
+
+    if (!session) return res.status(404).json({ error: "Session not found" })
+    await prisma.gameSession.delete({ where: { id: sessId } })
+    console.log('sess deleted')
+
+    const timeMs = session.finishedAt - session.startedAt
+
+    const MIN_MS = 3000
+    if (timeMs < MIN_MS) return res.status(400).json({ error: "Time too short" })
+
+    return res.json({ timeMs })
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: "Server error" })
+  }
+}

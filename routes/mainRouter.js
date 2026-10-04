@@ -5,7 +5,9 @@ import {
     getAllCharFromScene,
     getOneCharFromScene,
     postScore,
-    coordsCheck
+    coordsCheck, 
+    startTime, 
+    stopTime
 } from '../controllers/mainController.js'
 
 export const mainRouter = Router()
@@ -18,4 +20,7 @@ mainRouter.get('/scene/:slug/char/:charId', getOneCharFromScene)
 
 mainRouter.get('/scene/:slug/check', coordsCheck)
 
-mainRouter.post('/scene/:slug', postScore)
+// mainRouter.post('/scene/:slug', postScore)
+
+mainRouter.post('/scene/:slug/start', startTime)
+mainRouter.post('/scene/:slug/:sessId/stop', stopTime)
