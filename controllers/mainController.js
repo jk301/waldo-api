@@ -87,11 +87,34 @@ export async function coordsCheck (req, res) {
     }
 }
 
+export async function getScore (req, res) {
+    const { slug } = req.params
+
+    try {
+        const scene = await prisma.scene.findUnique({ where: { slug } })
+        if (!scene) return res.status(404).json({ error: "Scene not found" })
+        
+        const scores = await prisma.score.findMany({
+            where: { sceneId: scene.id }, 
+            orderBy : [
+                { timeMs: 'asc' }, 
+                { createdAt: 'asc' }
+            ]
+        })
+
+        return res.status(200).json({ scores, title: scene.title })
+    } catch (error) {``
+        console.log(error)
+        return res.status(500).json({ error: 'Server' })
+    }
+}
+
 export async function postScore (req, res) {
     const { slug } = req.params
     const { playerName, timeMs } = req.body
     try {
         const scene = await prisma.scene.findUnique({ where: { slug } })
+        if (!scene) return res.status(404).json({ error: "Scene not found" })
         const score = await prisma.score.create({
             data: {
                 playerName, 
@@ -99,8 +122,10 @@ export async function postScore (req, res) {
                 sceneId: scene.id
             }
         })
+        return res.json({ message: `Score added to LB-${slug}` })
     } catch (error) {
         console.log(error)
+        return res.status(500).json({ error: "Server error" })
     }
 }
 
