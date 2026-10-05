@@ -14,7 +14,7 @@ export async function getScene(req, res) {
     try {
         const scene = await prisma.scene.findUnique({ 
             where: { slug }, 
-            include: { characters: { id: true, name: true } } 
+            include: { characters: { select: { id: true, name: true } } } 
         })
         return res.status(200).json({ scene })
     } catch (error) {
@@ -92,17 +92,23 @@ export async function getScore (req, res) {
 
 export async function postScore (req, res) {
     const { slug } = req.params
-    const { playerName, timeMs } = req.body
+    const { playerName, sessId } = req.body
     try {
         const scene = await prisma.scene.findUnique({ where: { slug } })
         if (!scene) return res.status(404).json({ error: "Scene not found" })
+        
+        const session = await prisma.gameSession.findUnique({ where: { id: sessId } })
+        if (!session) return res.status(404).json({ error: "Session not found" })
+        
         const score = await prisma.score.create({
             data: {
                 playerName, 
-                timeMs, 
+                timeMs: session.finishedAt - session.startedAt, 
                 sceneId: scene.id
             }
         })
+        await prisma.gameSession.delete({ where: { id: sessId } })
+        
         return res.json({ message: `Score added to LB-${slug}` })
     } catch (error) {
         console.log(error)
@@ -126,19 +132,12 @@ export async function startTime (req, res) {
 
 export async function stopTime(req, res) {
   const { sessId } = req.params
-
   try {
-
     const session = await prisma.gameSession.update({
       where: { id: sessId },
       data: { finishedAt: new Date() },
     })
-
-    console.log(`Session updated: ${session}`)
-
     if (!session) return res.status(404).json({ error: "Session not found" })
-    await prisma.gameSession.delete({ where: { id: sessId } })
-    console.log('sess deleted')
 
     const timeMs = session.finishedAt - session.startedAt
 
