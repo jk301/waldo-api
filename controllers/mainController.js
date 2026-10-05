@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma.js";
 
 export async function getAllScenes (req, res) {
     try {
-        const allScenes = await prisma.scene.findMany({ include: { characters: true } })
+        const allScenes = await prisma.scene.findMany()
         return res.status(200).json({ allScenes })
     } catch (error) {
         console.log(error)
@@ -12,30 +12,11 @@ export async function getAllScenes (req, res) {
 export async function getScene(req, res) {
     const { slug } = req.params
     try {
-        const scene = await prisma.scene.findUnique({ where: { slug }, include: { characters: true } })
+        const scene = await prisma.scene.findUnique({ 
+            where: { slug }, 
+            include: { characters: { id: true, name: true } } 
+        })
         return res.status(200).json({ scene })
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export async function getOneCharFromScene (req, res) {
-    const { slug, charId } = req.params
-    try {
-        const scene = await prisma.scene.findUnique({ where: { slug } })
-        const char = await prisma.character.findUnique({ where: { id: charId, sceneId: scene.id  } })
-        return res.status(200).json({ char })
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export async function getAllCharFromScene(req, res) {
-    const { slug } = req.params
-    try {
-        const scene = await prisma.scene.findUnique({ where: { slug } })
-        const allChar = await prisma.character.findMany({ where: { sceneId: scene.id } })
-        return res.status(200).json({ allChar })
     } catch (error) {
         console.log(error)
     }

@@ -17,7 +17,6 @@ mainRouter.get('/scene/all', getAllScenes)
 mainRouter.get('/scene/:slug', getScene)
 
 mainRouter.get('/scene/:slug/allchar', getAllCharFromScene)
-mainRouter.get('/scene/:slug/char/:charId', getOneCharFromScene)
 
 mainRouter.get('/scene/:slug/check', coordsCheck)
 
