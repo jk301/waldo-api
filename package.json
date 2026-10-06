@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1", 
+    "build": "npx prisma generate && npx prisma migrate deploy", 
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "prisma": "^7.10.0", 
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "cors": "^2.8.6",
@@ -18,8 +21,5 @@
     "express": "^5.2.1",
     "node-cron": "^4.6.0",
     "pg": "^8.23.0"
-  },
-  "devDependencies": {
-    "prisma": "^7.10.0"
   }
 }
