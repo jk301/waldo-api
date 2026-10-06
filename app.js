@@ -7,7 +7,7 @@ import { mainRouter } from './routes/mainRouter.js'
 const app = express()
 
 app.use(cors({
-    origin: ['http://localhost:5173']
+    origin: ['http://localhost:5173', 'https://where-might-waldo-be.netlify.app/']
 }))
 
 app.use(express.json())
