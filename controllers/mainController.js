@@ -1,4 +1,21 @@
 import { prisma } from "../lib/prisma.js";
+import cron from "node-cron";
+
+cron.schedule('0 * * * *', cleanSess)
+
+async function cleanSess () {
+    const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000)
+    try {
+        const result = await prisma.gameSession.deleteMany({
+            where : {
+                startedAt: { lt: cutoff }
+            }
+        })
+        console.log(`Cleaned up ${result.count} sessions at `, new Date())
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export async function getAllScenes (req, res) {
     try {
